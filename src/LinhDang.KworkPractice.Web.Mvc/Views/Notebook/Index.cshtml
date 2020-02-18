@@ -2,7 +2,7 @@
 @using LinhDang.KworkPractice.Web.Startup
 @model LinhDang.KworkPractice.Web.Models.Notebooks.AllNotebookViewModel
 @{
-    ViewBag.CurrentPageName = PageNames.Notebook; // The menu item will be active for this page.  
+    ViewBag.CurrentPageName = PageNames.Notebook; // The menu item will be active for this page.
 }
 @section scripts
     {
@@ -36,18 +36,21 @@
                 <div class="row clearfix">
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table" id="notebook_tbl">
                                 <thead>
                                     <tr>
-                                        <th colspan="2">@L("Name")</th>
+                                        <th colspan="2">
+                                            @L("Name")
+
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var notebook in Model.Notebooks)
                                     {
-                                        <tr>
+                                        <tr id="nt_@notebook.Id">
                                             <td>
-                                                <i class="material-icons icon-bottom" style="color:@(notebook.Id==Model.Selected ? "green":"red");">@(notebook.Id == Model.Selected ? "check_box" : "indeterminate_check_box")</i>
+                                                <i class="material-icons icon-bottom" style="color:@(notebook.Id==Model.Selected ? "green":"sliver");">@(notebook.Id == Model.Selected ? "check_box" : "indeterminate_check_box")</i>
                                                 @Html.ActionLink(notebook.Name, "Index", "Notebook", new { selected = notebook.Id })
                                             </td>
                                             <td class="dropdown text-right">
@@ -55,8 +58,8 @@
                                                     <i class="material-icons">menu</i>
                                                 </a>
                                                 <ul class="dropdown-menu pull-right">
-                                                    <li><a href="#" class="waves-effect waves-block edit-user" data-notebook-id="@notebook.Id" data-toggle="modal" data-target="#UserEditModal"><i class="material-icons">edit</i>@L("Edit")</a></li>
-                                                    <li><a href="#" class="waves-effect waves-block delete-user" data-notebook-id="@notebook.Id"><i class="material-icons">delete_sweep</i>@L("Delete")</a></li>
+                                                    <li><a href="#" class="waves-effect waves-block edit-notebook" data-notebook-id="@notebook.Id"><i class="material-icons">edit</i>@L("Edit")</a></li>
+                                                    <li><a href="#" class="waves-effect waves-block delete-notebook" data-row-id="nt_@notebook.Id" data-notebook-id="@notebook.Id" data-notebook-name="@notebook.Name"><i class="material-icons">delete_sweep</i>@L("Delete")</a></li>
                                                 </ul>
                                             </td>
                                         </tr>
@@ -71,24 +74,37 @@
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table" id="note_tbl">
                                 <thead>
                                     <tr>
-                                        <th colspan="2"> @Html.Raw((Model.SelectedNotebook != null) ? $"{Model.SelectedNotebook.Name} {Model.SelectedNotebook.Notes.Count}" : string.Empty)</th>
+                                        <th colspan="2">
+                                            @Html.Raw((Model.SelectedNotebook != null) ? $"{Model.SelectedNotebook.Name}" : string.Empty)
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var note in Model.SelectedNotebook.Notes)
                                     {
-                                        <tr>
-                                            <td>@note.Content</td>
-                                            <td class="dropdown text-right">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                        <tr id="n_@note.Id">
+                                            <td>
+                                                <i class="text-info"> @note.CreationTime.ToString()</i>
+                                                <br />
+                                                <div contenteditable="false" id="ta_@note.Id" class="text-justify text-info">
+                                                    @note.Content
+                                                </div>
+                                            </td>
+                                            <td class="dropdown text-right ">
+
+                                                <a href="#" class="btn-save-note" style="display:none" id="note_save_@note.Id" data-note-id="@note.Id" data-notebook-id="@Model.SelectedNotebook.Id">
+                                                    <i class="material-icons">save</i>
+                                                </a>
+
+                                                <a href="#" class="dropdown-toggle" id="note_menu_@note.Id" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                                     <i class="material-icons">menu</i>
                                                 </a>
-                                                <ul class="dropdown-menu pull-right">
-                                                    <li><a href="#" class="waves-effect waves-block edit-user" data-note-id="@note.Id" data-toggle="modal" data-target="#UserEditModal"><i class="material-icons">edit</i>@L("Edit")</a></li>
-                                                    <li><a href="#" class="waves-effect waves-block delete-user" data-note-id="@note.Id" data-notebook-id="@note.NotebookId"><i class="material-icons">delete_sweep</i>@L("Delete")</a></li>
+                                                <ul class="dropdown-menu pull-right top-70">
+                                                    <li><a href="#" class="waves-effect waves-block edit-note" data-note-id="@note.Id"><i class="material-icons">edit</i>@L("Edit")</a></li>
+                                                    <li><a href="#" class="waves-effect waves-block delete-note" data-note-id="@note.Id" data-row-id="n_@note.Id"><i class="material-icons">delete_sweep</i>@L("Delete")</a></li>
                                                 </ul>
                                             </td>
                                         </tr>
@@ -99,18 +115,11 @@
                                 <i class="material-icons">add</i>
                             </button>
                         </div>
-
                     </div>
                 </div>
-
-
-
             </div>
-
-
         </div>
     </div>
-
 </div>
 <div class="modal fade" id="NotebookCreateModal" tabindex="-1" role="dialog" aria-labelledby="UserCreateModalLabel" data-backdrop="static">
     <div class="modal-dialog" role="document">
@@ -157,7 +166,7 @@
                         <div class="col-sm-12">
                             <div class="form-group form-float">
                                 <div class="form-line">
-                                    <textarea type="text" name="Content" class="form-control" required rows="10" wrap="soft" ></textarea>
+                                    <textarea type="text" name="Content" class="form-control" required rows="10" wrap="soft"></textarea>
                                     <label class="form-label">@L("Content")</label>
                                 </div>
                             </div>

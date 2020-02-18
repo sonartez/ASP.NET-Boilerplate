@@ -70,8 +70,8 @@ namespace LinhDang.KworkPractice.Web.Mvc.Controllers
             var selectedNotebook = notebooks.FirstOrDefault(n => n.Id == notebookViewModel.Selected);
             if (selectedNotebook == null)
             {
-                selectedNotebook = new LinhDang.KworkPractice.Notebooks.Dto.NotebookDto()
-                { Notes = new List<LinhDang.KworkPractice.Notebooks.Dto.NoteDto>() };
+                selectedNotebook = new NotebookDto()
+                { Notes = new List<NoteDto>() };
             }
             else
             {
